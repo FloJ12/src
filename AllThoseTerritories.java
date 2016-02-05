@@ -291,6 +291,13 @@ public class AllThoseTerritories {
         }
     }
 
+    public void move(Territory source, Territory dest) {
+        if (source.armyStrength > 1) {
+            source.changeArmyStrength(-1);
+            dest.changeArmyStrength(1);
+        }
+    }
+
     public void attack(Territory own, Territory enemy) {
         int attackers = Math.min(3, own.armyStrength - 1);
         int defenders = Math.min(2, enemy.armyStrength);
