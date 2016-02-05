@@ -27,8 +27,10 @@ public class AllThoseTerritories {
     private boolean stepAttackAndMove = false;
     private boolean isPlayersTurn = true;
     private Territory own;
-    private Territory other_own;
+    private Territory sourceOfMovedTroups;
+    private Territory destOfMovedTroups;
     private Territory enemy;
+    private Territory newlyObtainedLand;
 
     public AllThoseTerritories(Player[] humanPlayers, Player[] kiPlayers, String pathToMap) {
         this.territories = readTerritories(pathToMap);
@@ -259,8 +261,7 @@ public class AllThoseTerritories {
                     }
                     else if (own != territory) {
                         own.setSelected(false); // is old selected territory, deselect
-                        other_own = own;
-                        own = territory;
+                        own = territory; // set selected territory
                         own.setSelected(true);
                     }
                     else if (own == territory) {
@@ -271,7 +272,11 @@ public class AllThoseTerritories {
                 else if (own != null && own.isNeighbor(territory) && own.armyStrength > 1 && territory.owned_by == this.kiPlayers[0]) {
                     enemy = territory;
                     enemy.setSelected(true);
-                    attack(own, enemy);
+                    boolean successfulAttack = attack(own, enemy);
+                    if (successfulAttack) {
+                        newlyObtainedLand = enemy;
+                        enemy = null;
+                    }
                     own.setSelected(false);
                     enemy.setSelected(false);
                 }
@@ -309,7 +314,7 @@ public class AllThoseTerritories {
         }
     }
 
-    public void attack(Territory own, Territory enemy) {
+    public boolean attack(Territory own, Territory enemy) {
         int attackers = Math.min(3, own.armyStrength - 1);
         int defenders = Math.min(2, enemy.armyStrength);
         int[] atk_dice = new int[attackers];
@@ -341,10 +346,14 @@ public class AllThoseTerritories {
                 own.changeArmyStrength(-1);
             }
         }
+        // attack successful
         if (enemy.armyStrength == 0) {
-            move(own.armyStrength - 1, own, enemy);
+            move(attackers, own, enemy);
             enemy.setOwner(this.humanPlayers[0]);
+            return true;
         }
+        // attack not successful
+        return false;
     }
     private int calc_reinforce(Player player) {
         int result = 0;
@@ -490,13 +499,18 @@ public class AllThoseTerritories {
     }
 
     public void territoryRightClicked(Territory territory) {
-        if (own != null && own.armyStrength > 1 && own.isNeighbor(territory) && other_own == null) {
-            other_own = territory;
-            move(own, territory);
+        if (own != null && own.armyStrength > 1 && own.isNeighbor(territory) && sourceOfMovedTroups == null && destOfMovedTroups == null) {
+            sourceOfMovedTroups = own;
+            destOfMovedTroups = territory;
+            move(sourceOfMovedTroups, destOfMovedTroups);
         }
-        else if (own != null && other_own == territory) {
-            other_own = null;
-            move(own, other_own);
+        else if (own == destOfMovedTroups && territory == sourceOfMovedTroups) {
+            move(destOfMovedTroups, sourceOfMovedTroups);
+            sourceOfMovedTroups = null;
+            destOfMovedTroups = null;
+        }
+        else if (territory == newlyObtainedLand) {
+            move(own, newlyObtainedLand);
         }
     }
 }
