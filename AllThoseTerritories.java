@@ -27,6 +27,7 @@ public class AllThoseTerritories {
     private boolean stepAttackAndMove = false;
     private boolean isPlayersTurn = true;
     private Territory own;
+    private Territory other_own;
     private Territory enemy;
 
     public AllThoseTerritories(Player[] humanPlayers, Player[] kiPlayers, String pathToMap) {
@@ -258,6 +259,7 @@ public class AllThoseTerritories {
                     }
                     else if (own != territory) {
                         own.setSelected(false); // is old selected territory, deselect
+                        other_own = own;
                         own = territory;
                         own.setSelected(true);
                     }
@@ -488,8 +490,13 @@ public class AllThoseTerritories {
     }
 
     public void territoryRightClicked(Territory territory) {
-        if (own != null && own.armyStrength > 1 && own.isNeighbor(territory)) {
+        if (own != null && own.armyStrength > 1 && own.isNeighbor(territory) && other_own == null) {
+            other_own = territory;
             move(own, territory);
+        }
+        else if (own != null && other_own == territory) {
+            other_own = null;
+            move(own, other_own);
         }
     }
 }

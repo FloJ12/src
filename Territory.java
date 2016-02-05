@@ -123,7 +123,16 @@ public class Territory {
                 connection1.setStroke(Color.LIGHTGRAY);
                 connection2.setStroke(Color.LIGHTGRAY);
                 g.getChildren().addAll(connection1, connection2);
-            } else {
+            }
+            // and vice-versa
+            else if (name.equals("Kamchatka") && n.name.equals("Alaska")) {
+                Polyline connection1 = new Polyline(n.capital.getX(), n.capital.getY(), 0, n.capital.getY());
+                Polyline connection2 = new Polyline(1250, capital.getY(), capital.getX(), capital.getY());
+                connection1.setStroke(Color.LIGHTGRAY);
+                connection2.setStroke(Color.LIGHTGRAY);
+                g.getChildren().addAll(connection1, connection2);
+            }
+            else {
                 Polyline connection = new Polyline(capital.getX(), capital.getY(), n.capital.getX(), n.capital.getY());
                 connection.setStroke(Color.LIGHTGRAY);
                 g.getChildren().add(connection);
