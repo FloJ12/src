@@ -59,6 +59,11 @@ public class Territory {
     }
 
     public void setOwner(Player new_owner) {
+
+        if (this.owned_by != null) {
+            this.owned_by.dropTerritoryOwnership(this);
+        }
+        new_owner.addTerritory(this);
         if (new_owner.name.equals("User")) {
             for(Polygon p : polygons) {
                 p.setFill(Color.DODGERBLUE);

@@ -12,10 +12,15 @@ public class Player {
     String name;
     boolean isHuman;
     private Label reinforce_status;
+    private List<Territory> owned_territories = new LinkedList<>();
     public Player(String name, boolean isHuman) {
         this.name = name;
         this.isHuman = isHuman;
     }
+    public Territory getRandomOwndTerritory() {
+        return owned_territories.get((int)(owned_territories.size() * Math.random()));
+    }
+
 
     public void deployReinforcement(Territory t) {
         if(availableReinforcements > 0) {
@@ -72,4 +77,11 @@ public class Player {
         return false;
     }
 
+    public void addTerritory(Territory territory) {
+        this.owned_territories.add(territory);
+    }
+
+    public void dropTerritoryOwnership(Territory territory) {
+        this.owned_territories.remove(territory);
+    }
 }

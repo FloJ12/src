@@ -235,9 +235,11 @@ public class AllThoseTerritories {
                 if (allOccupied()) {
                     phaseOccupy = false;
                     phaseConqer = true;
-                    // TODO: Erste Verstärkungen ermitteln
+                    // Erste Verstärkungen ermitteln
                     this.humanPlayers[0].availableReinforcements = calc_reinforce(humanPlayers[0]);
                     this.humanPlayers[0].updateLabel();
+
+                    this.kiPlayers[0].availableReinforcements = calc_reinforce(kiPlayers[0]);
                 }
             }
         } else if (phaseConqer) {
@@ -250,39 +252,54 @@ public class AllThoseTerritories {
                     this.humanPlayers[0].deployReinforcement(territory);
                     if(this.humanPlayers[0].availableReinforcements == 0) {
                         stepReinforcements = false;
+
+                        //computer deploys reinforcements
+
+                        while (this.kiPlayers[0].availableReinforcements > 0) {
+                            kiPlayers[0].getRandomOwndTerritory().changeArmyStrength(1);
+                            kiPlayers[0].availableReinforcements--;
+                        }
                         stepAttackAndMove = true;
                     }
                 }
             }
             else if(stepAttackAndMove) {
+                // when own territory is clicked
                 if (territory.owned_by == this.humanPlayers[0]) {
+                    //if no territory, selected
                     if (own == null) {
                         own = territory;
                         own.setSelected(true);
                     }
+                    // switch selected territory
                     else if (own != territory) {
                         own.setSelected(false); // is old selected territory, deselect
                         own = territory; // set selected territory
                         own.setSelected(true);
                     }
+                    // deselect
                     else if (own == territory) {
                         own.setSelected(false);
                         own = null;
                     }
                 }
+                // when enemy territory is clicked
+                // attack if: 1) base selected, 2)enemy is neighbour of base, 3) base armyStrength > 1
                 else if (own != null && own.isNeighbor(territory) && own.armyStrength > 1 && territory.owned_by == this.kiPlayers[0]) {
                     enemy = territory;
                     enemy.setSelected(true);
                     boolean successfulAttack = attack(own, enemy);
                     if (successfulAttack) {
+                        // variables for follow-up move
                         newlyObtainedLand = enemy;
                         sourceOfSuccessfulAttack = own;
-                        enemy = null;
                     }
+                    //deselect after attack
                     own.setSelected(false);
                     own = null;
                     enemy.setSelected(false);
                     enemy = null;
+
                 }
             }
         }
@@ -483,19 +500,23 @@ public class AllThoseTerritories {
 
     public void endTurn() {
         System.out.println("Button pressed");
+        // cumputer attack & reinforcements and new turn
     }
 
     public void territoryRightClicked(Territory territory) {
+        // normal move, if 1) selected base, 2) base armyStrength > 1, 3) no move happened before
         if (own != null && own.armyStrength > 1 && own.isNeighbor(territory) && sourceOfMovedTroups == null && destOfMovedTroups == null && territory != newlyObtainedLand) {
             sourceOfMovedTroups = own;
             destOfMovedTroups = territory;
             move(sourceOfMovedTroups, destOfMovedTroups);
         }
+        // move happened, undo move
         else if (own == destOfMovedTroups && territory == sourceOfMovedTroups) {
             move(destOfMovedTroups, sourceOfMovedTroups);
             sourceOfMovedTroups = null;
             destOfMovedTroups = null;
         }
+        // follow-up move
         else if (territory == newlyObtainedLand && sourceOfSuccessfulAttack.armyStrength > 1) {
             move(sourceOfSuccessfulAttack, newlyObtainedLand);
         }
