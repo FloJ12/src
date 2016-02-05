@@ -16,7 +16,7 @@ import java.util.Map;
 public class Territory {
     public String name;
     public Player owned_by;
-    private int armyStrength;
+    public int armyStrength;
     private Map<String, Territory> neighbors = new HashMap();
     private List<Polygon> polygons = new ArrayList<>();
     private List<Polyline> polylines = new ArrayList<>();

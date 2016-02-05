@@ -290,6 +290,39 @@ public class AllThoseTerritories {
         }
     }
 
+    public void attack(Territory own, Territory enemy) {
+        int attackers = Math.min(3, own.armyStrength - 1);
+        int defenders = Math.min(2, enemy.armyStrength);
+        int[] atk_dice = new int[attackers];
+        int[] def_dice = new int[defenders];
+
+        for (int i = 0; i < atk_dice.length; i++) {
+            atk_dice[i] = (int) (Math.random() * 6) + 1;
+        }
+
+        for (int i = 0; i < def_dice.length; i++) {
+            def_dice[i] = (int) (Math.random() * 6) + 1;
+        }
+
+        Arrays.sort(atk_dice);
+        Arrays.sort(def_dice);
+
+
+        if (atk_dice[attackers-1] > def_dice[defenders-1]) {
+            enemy.armyStrength--;
+        } else {
+            own.armyStrength--;
+        }
+
+        if (defenders == 2) {
+            if (atk_dice[attackers-2] > def_dice[defenders-2]) {
+                enemy.armyStrength--;
+            } else {
+                own.armyStrength--;
+            }
+        }
+
+    }
     private int calc_reinforce(Player player) {
         int result = 0;
         for (Map.Entry<String, Continent> entry : continents.entrySet()) {
