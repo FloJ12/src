@@ -269,6 +269,8 @@ public class AllThoseTerritories {
                     enemy = territory;
                     enemy.setSelected(true);
                     attack(own, enemy);
+                    own.setSelected(false);
+                    enemy.setSelected(false);
                 }
                 //attack(Territory own, Territory enemy);
                 //move(Territory source, Territory dest);
@@ -298,6 +300,12 @@ public class AllThoseTerritories {
         }
     }
 
+    public void move(int countArmies, Territory source, Territory dest) {
+        for (int i = 0; i < countArmies; i++) {
+            move(source, dest);
+        }
+    }
+
     public void attack(Territory own, Territory enemy) {
         int attackers = Math.min(3, own.armyStrength - 1);
         int defenders = Math.min(2, enemy.armyStrength);
@@ -323,20 +331,16 @@ public class AllThoseTerritories {
         } else {
             own.changeArmyStrength(-1);
         }
-        if (enemy.armyStrength == 0) {
-            enemy.setOwner(this.humanPlayers[0]);
+        if (defenders == 2 && attackers >= 2) {
+            if (atk_dice[attackers - 2] > def_dice[defenders - 2]) {
+                enemy.changeArmyStrength(-1);
+            } else {
+                own.changeArmyStrength(-1);
+            }
         }
-        else {
-            if (defenders == 2 && attackers >= 2) {
-                if (atk_dice[attackers - 2] > def_dice[defenders - 2]) {
-                    enemy.changeArmyStrength(-1);
-                } else {
-                    own.changeArmyStrength(-1);
-                }
-            }
-            if (enemy.armyStrength == 0) {
-                enemy.setOwner(this.humanPlayers[0]);
-            }
+        if (enemy.armyStrength == 0) {
+            move(own.armyStrength - 1, own, enemy);
+            enemy.setOwner(this.humanPlayers[0]);
         }
     }
     private int calc_reinforce(Player player) {
@@ -480,6 +484,12 @@ public class AllThoseTerritories {
 
     public void endTurn() {
         System.out.println("Button pressed");
+    }
+
+    public void territoryRightClicked(Territory territory) {
+        if (own != null && own.armyStrength > 1 && own.isNeighbor(territory)) {
+            move(own, territory);
+        }
     }
 }
 
