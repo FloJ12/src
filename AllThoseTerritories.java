@@ -265,13 +265,13 @@ public class AllThoseTerritories {
                         own = null;
                     }
                 }
-                else if (own != null && territory.owned_by == this.kiPlayers[0]) {
+                else if (own != null && own.armyStrength > 1 &&/* enemy.isNeighbor() &&*/ territory.owned_by == this.kiPlayers[0]) {
                     enemy = territory;
                     enemy.setSelected(true);
                     attack(own, enemy);
                 }
                 //attack(Territory own, Territory enemy);
-                //move(int armies, Territory source, Territory dest);
+                //move(Territory source, Territory dest);
             }
             //TODO: Verstärkungen ermitteln und verteilen
             /*if (this.humanPlayers[0].availableReinforcements > 0) {
@@ -323,15 +323,21 @@ public class AllThoseTerritories {
         } else {
             own.changeArmyStrength(-1);
         }
-
-        if (defenders == 2 && attackers >= 2) {
-            if (atk_dice[attackers-2] > def_dice[defenders-2]) {
-                enemy.changeArmyStrength(-1);
-            } else {
-                own.changeArmyStrength(-1);
+        if (enemy.armyStrength == 0) {
+            enemy.setOwner(this.humanPlayers[0]);
+        }
+        else {
+            if (defenders == 2 && attackers >= 2) {
+                if (atk_dice[attackers - 2] > def_dice[defenders - 2]) {
+                    enemy.changeArmyStrength(-1);
+                } else {
+                    own.changeArmyStrength(-1);
+                }
+            }
+            if (enemy.armyStrength == 0) {
+                enemy.setOwner(this.humanPlayers[0]);
             }
         }
-
     }
     private int calc_reinforce(Player player) {
         int result = 0;
