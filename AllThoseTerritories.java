@@ -105,9 +105,11 @@ public class AllThoseTerritories {
                         String[] neighborsArray = neighborsString.split("-");
 
                         // Add every corresponding neighbor Territory object to the current territory
+                        // and if current territory is not already a neighbor of neighbor Territory, add it there as well
                         for (String neighborString : neighborsArray) {
                             Territory neighbor = territoryMap.get(neighborString);
                             territoryMap.get(territoryName).addNeighbor(neighbor);
+                            territoryMap.get(neighbor.name).addNeighbor(territoryMap.get(territoryName));
                         }
                     }
                 }
