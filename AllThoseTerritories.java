@@ -276,29 +276,15 @@ public class AllThoseTerritories {
                     boolean successfulAttack = attack(own, enemy);
                     if (successfulAttack) {
                         newlyObtainedLand = enemy;
+                        sourceOfSuccessfulAttack = own;
                         enemy = null;
                     }
                     own.setSelected(false);
+                    own = null;
                     enemy.setSelected(false);
+                    enemy = null;
                 }
-                //attack(Territory own, Territory enemy);
-                //move(Territory source, Territory dest);
             }
-            //TODO: Verstärkungen ermitteln und verteilen
-            /*if (this.humanPlayers[0].availableReinforcements > 0) {
-
-                if (territory.owned_by == humanPlayers[0]) {
-                    territory.changeArmyStrength(1);
-                    this.humanPlayers[0].availableReinforcements--;
-                }
-
-                if (this.humanPlayers[0].availableReinforcements == 1) {
-
-                }
-            } else { //TODO: Write code for Conquer phase
-                territory.setSelected(humanPlayers[0]);
-            }*/
-
         }
     }
 
@@ -500,7 +486,7 @@ public class AllThoseTerritories {
     }
 
     public void territoryRightClicked(Territory territory) {
-        if (own != null && own.armyStrength > 1 && own.isNeighbor(territory) && sourceOfMovedTroups == null && destOfMovedTroups == null) {
+        if (own != null && own.armyStrength > 1 && own.isNeighbor(territory) && sourceOfMovedTroups == null && destOfMovedTroups == null && territory != newlyObtainedLand) {
             sourceOfMovedTroups = own;
             destOfMovedTroups = territory;
             move(sourceOfMovedTroups, destOfMovedTroups);
