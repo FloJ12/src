@@ -24,6 +24,10 @@ public class Territory {
     private Label armyStrengthDisplay;
     private boolean isSelected = false;
 
+    public  boolean isNeighbor(Territory the_neighbor) {
+        return this.neighbors.containsValue(the_neighbor);
+    }
+
     public Territory(String name) {
         this.name = name;
         this.owned_by = null;
