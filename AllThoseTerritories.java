@@ -268,6 +268,7 @@ public class AllThoseTerritories {
                 else if (own != null && territory.owned_by == this.kiPlayers[0]) {
                     enemy = territory;
                     enemy.setSelected(true);
+                    attack(own, enemy);
                 }
                 //attack(Territory own, Territory enemy);
                 //move(int armies, Territory source, Territory dest);
@@ -298,10 +299,12 @@ public class AllThoseTerritories {
 
         for (int i = 0; i < atk_dice.length; i++) {
             atk_dice[i] = (int) (Math.random() * 6) + 1;
+            System.out.println("Würfel ATK: " + atk_dice[i]);
         }
 
         for (int i = 0; i < def_dice.length; i++) {
             def_dice[i] = (int) (Math.random() * 6) + 1;
+            System.out.println("Würfel DEF: " + def_dice[i]);
         }
 
         Arrays.sort(atk_dice);
@@ -309,16 +312,16 @@ public class AllThoseTerritories {
 
 
         if (atk_dice[attackers-1] > def_dice[defenders-1]) {
-            enemy.armyStrength--;
+            enemy.changeArmyStrength(-1);
         } else {
-            own.armyStrength--;
+            own.changeArmyStrength(-1);
         }
 
-        if (defenders == 2) {
+        if (defenders == 2 && attackers >= 2) {
             if (atk_dice[attackers-2] > def_dice[defenders-2]) {
-                enemy.armyStrength--;
+                enemy.changeArmyStrength(-1);
             } else {
-                own.armyStrength--;
+                own.changeArmyStrength(-1);
             }
         }
 
