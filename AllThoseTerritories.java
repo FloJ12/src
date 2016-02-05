@@ -31,6 +31,7 @@ public class AllThoseTerritories {
     private Territory destOfMovedTroups;
     private Territory enemy;
     private Territory newlyObtainedLand;
+    private Territory sourceOfSuccessfulAttack;
 
     public AllThoseTerritories(Player[] humanPlayers, Player[] kiPlayers, String pathToMap) {
         this.territories = readTerritories(pathToMap);
@@ -509,8 +510,8 @@ public class AllThoseTerritories {
             sourceOfMovedTroups = null;
             destOfMovedTroups = null;
         }
-        else if (territory == newlyObtainedLand) {
-            move(own, newlyObtainedLand);
+        else if (territory == newlyObtainedLand && sourceOfSuccessfulAttack.armyStrength > 1) {
+            move(sourceOfSuccessfulAttack, newlyObtainedLand);
         }
     }
 }
