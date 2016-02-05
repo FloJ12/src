@@ -249,7 +249,6 @@ public class AllThoseTerritories {
                 }
             }
             else if(stepAttackAndMove) {
-                System.out.println("Attack");
                 if (territory.owned_by == this.humanPlayers[0]) {
                     if (own == null) {
                         own = territory;
@@ -265,7 +264,7 @@ public class AllThoseTerritories {
                         own = null;
                     }
                 }
-                else if (own != null && own.armyStrength > 1 && own.isNeighbor(enemy) && territory.owned_by == this.kiPlayers[0]) {
+                else if (own != null && own.isNeighbor(territory) && own.armyStrength > 1 && territory.owned_by == this.kiPlayers[0]) {
                     enemy = territory;
                     enemy.setSelected(true);
                     attack(own, enemy);
