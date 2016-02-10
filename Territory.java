@@ -41,7 +41,7 @@ public class Territory {
 
     public void changeArmyStrength(int change) {    // increaseArmyS --> changeArmy...
         this.armyStrength += change;
-        armyStrengthDisplay.setText(Integer.toString(armyStrength));
+        armyStrengthDisplay.setText(Integer.toString(this.armyStrength));
     }
 
     public void addNeighbor(Territory neighbor) {

@@ -215,6 +215,39 @@ public class AllThoseTerritories {
         return territoryName;
     }
 
+    public void endTurn() {
+        System.out.println("Button pressed");
+        // cumputer attack & reinforcements and new turn
+        stepAttackAndMove = false;
+        int attacks = (int) (Math.random() * 100);
+
+        Territory the_own = kiPlayers[0].getRandomOwndTerritory();
+        Territory the_enemy;
+        while (attacks > 0) {
+
+
+
+
+
+            do {
+                own = getRndEnemyAdjaceTerri(own) == null? own: kiPlayers[0].getRandomOwndTerritory();
+                attacks--;
+
+            } while (own.armyStrength < 2 && getRndEnemyAdjaceTerri(own) == null && attacks > 0);
+            enemy = getRndEnemyAdjaceTerri(own);
+            attack(own, enemy);
+
+
+            attacks--;
+
+        }
+
+        this.humanPlayers[0].availableReinforcements = calc_reinforce(humanPlayers[0]);
+        this.humanPlayers[0].updateLabel();
+        this.kiPlayers[0].availableReinforcements = calc_reinforce(kiPlayers[0]);
+        stepReinforcements = true;
+    }
+
     //Is called when a territory is clicked.
     public void territoryClicked(Territory territory) {
         if (phaseOccupy) {
@@ -246,21 +279,17 @@ public class AllThoseTerritories {
             // System.out.println("Start: Conquer");
             if(stepReinforcements) {
                 if(this.humanPlayers[0].availableReinforcements == 0) {
-                    this.humanPlayers[0].availableReinforcements = calc_reinforce(humanPlayers[0]);
+
+                    stepReinforcements = false;
+
+                    while (this.kiPlayers[0].availableReinforcements > 0) {
+                        kiPlayers[0].getRandomOwndTerritory().changeArmyStrength(1);
+                        kiPlayers[0].availableReinforcements--;
+                    }
+                    stepAttackAndMove = true;
                 }
                 else {
                     this.humanPlayers[0].deployReinforcement(territory);
-                    if(this.humanPlayers[0].availableReinforcements == 0) {
-                        stepReinforcements = false;
-
-                        //computer deploys reinforcements
-
-                        while (this.kiPlayers[0].availableReinforcements > 0) {
-                            kiPlayers[0].getRandomOwndTerritory().changeArmyStrength(1);
-                            kiPlayers[0].availableReinforcements--;
-                        }
-                        stepAttackAndMove = true;
-                    }
                 }
             }
             else if(stepAttackAndMove) {
@@ -353,7 +382,7 @@ public class AllThoseTerritories {
         // attack successful
         if (enemy.armyStrength == 0) {
             move(attackers, own, enemy);
-            enemy.setOwner(this.humanPlayers[0]);
+            enemy.setOwner(own.owned_by);
             return true;
         }
         // attack not successful
@@ -392,6 +421,25 @@ public class AllThoseTerritories {
         }
         String randomKey = keys.get(random.nextInt(keys.size()));
         return this.getTerritoriesMap().get(randomKey);
+    }
+
+    private Territory getRndEnemyAdjaceTerri( Territory center) {
+        Random random = new Random();
+        List<String> keys = new ArrayList<String>();
+        for (Map.Entry<String, Territory> entry : this.getTerritoriesMap().entrySet()) {
+            String key = entry.getKey();
+            if (entry.getValue().owned_by == humanPlayers[0] && entry.getValue().isNeighbor(center)) {
+                keys.add(key);
+            }
+        }
+        if (keys.isEmpty()) {
+            return null;
+        }
+        else {
+            String randomKey = keys.get(random.nextInt(keys.size()));
+            return this.getTerritoriesMap().get(randomKey);
+        }
+
     }
 
     // May be outdated
@@ -498,10 +546,7 @@ public class AllThoseTerritories {
         }
     }
 
-    public void endTurn() {
-        System.out.println("Button pressed");
-        // cumputer attack & reinforcements and new turn
-    }
+
 
     public void territoryRightClicked(Territory territory) {
         // normal move, if 1) selected base, 2) base armyStrength > 1, 3) no move happened before

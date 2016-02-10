@@ -4,6 +4,7 @@
  */
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -56,9 +57,9 @@ public class RiskGame extends Application {
         Button btn = new Button("Zug beenden");
         Label reinforce_status = new Label("Available reinforcements: " + game.getHumanPlayers()[0].availableReinforcements);
         game.getHumanPlayers()[0].addLabel(reinforce_status);
-        btn.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
-            public void handle(MouseEvent event) {
+            public void handle(ActionEvent event) {
                 game.endTurn();
             }
         });
