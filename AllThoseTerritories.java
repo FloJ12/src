@@ -226,26 +226,26 @@ public class AllThoseTerritories {
         while (attacks > 0) {
 
 
-
-
-
             do {
-                own = getRndEnemyAdjaceTerri(own) == null? own: kiPlayers[0].getRandomOwndTerritory();
+                the_own = getRndEnemyAdjaceTerri(the_own) != null
+                        && the_own.armyStrength > 1 ? the_own: kiPlayers[0].getRandomOwndTerritory();
                 attacks--;
 
-            } while (own.armyStrength < 2 && getRndEnemyAdjaceTerri(own) == null && attacks > 0);
-            enemy = getRndEnemyAdjaceTerri(own);
-            attack(own, enemy);
+            } while (getRndEnemyAdjaceTerri(the_own) == null && attacks > 0);
 
+            if (getRndEnemyAdjaceTerri(the_own) != null && the_own.armyStrength > 1) {
+                the_enemy = getRndEnemyAdjaceTerri(the_own);
+                attack(the_own, the_enemy);
+            }
 
             attacks--;
 
         }
 
-        this.humanPlayers[0].availableReinforcements = calc_reinforce(humanPlayers[0]);
-        this.humanPlayers[0].updateLabel();
-        this.kiPlayers[0].availableReinforcements = calc_reinforce(kiPlayers[0]);
-        stepReinforcements = true;
+       // this.humanPlayers[0].availableReinforcements = calc_reinforce(humanPlayers[0]);
+       // this.humanPlayers[0].updateLabel();
+       // this.kiPlayers[0].availableReinforcements = calc_reinforce(kiPlayers[0]);
+       // stepReinforcements = true;
     }
 
     //Is called when a territory is clicked.
@@ -425,19 +425,18 @@ public class AllThoseTerritories {
 
     private Territory getRndEnemyAdjaceTerri( Territory center) {
         Random random = new Random();
-        List<String> keys = new ArrayList<String>();
+        List<Territory> keys = new ArrayList<Territory>();
         for (Map.Entry<String, Territory> entry : this.getTerritoriesMap().entrySet()) {
-            String key = entry.getKey();
+
             if (entry.getValue().owned_by == humanPlayers[0] && entry.getValue().isNeighbor(center)) {
-                keys.add(key);
+                keys.add(entry.getValue());
             }
         }
         if (keys.isEmpty()) {
             return null;
         }
         else {
-            String randomKey = keys.get(random.nextInt(keys.size()));
-            return this.getTerritoriesMap().get(randomKey);
+            return keys.get(random.nextInt(keys.size()));
         }
 
     }
