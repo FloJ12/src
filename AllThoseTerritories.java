@@ -242,10 +242,10 @@ public class AllThoseTerritories {
 
         }
 
-       // this.humanPlayers[0].availableReinforcements = calc_reinforce(humanPlayers[0]);
-       // this.humanPlayers[0].updateLabel();
-       // this.kiPlayers[0].availableReinforcements = calc_reinforce(kiPlayers[0]);
-       // stepReinforcements = true;
+        this.humanPlayers[0].availableReinforcements = calc_reinforce(humanPlayers[0]);
+        this.humanPlayers[0].updateLabel();
+        this.kiPlayers[0].availableReinforcements = calc_reinforce(kiPlayers[0]);
+        stepReinforcements = true;
     }
 
     //Is called when a territory is clicked.
