@@ -215,17 +215,24 @@ public class AllThoseTerritories {
         return territoryName;
     }
 
+    public boolean checkWinCondition(Player player) {
+        boolean result = true;
+        for (Map.Entry<String, Territory> entry: territories.entrySet()) {
+            result = result && entry.getValue().owned_by == player;
+        }
+
+        return result;
+    }
     public void endTurn() {
         System.out.println("Button pressed");
-        // cumputer attack & reinforcements and new turn
+        // computer attack & reinforcements and new turn
         stepAttackAndMove = false;
         int attacks = (int) (Math.random() * 100);
 
         Territory the_own = kiPlayers[0].getRandomOwndTerritory();
         Territory the_enemy;
         while (attacks > 0) {
-
-
+            // search for attack opportunities
             do {
                 the_own = getRndEnemyAdjaceTerri(the_own) != null
                         && the_own.armyStrength > 1 ? the_own: kiPlayers[0].getRandomOwndTerritory();
@@ -233,9 +240,16 @@ public class AllThoseTerritories {
 
             } while (getRndEnemyAdjaceTerri(the_own) == null && attacks > 0);
 
+            // attack if able
             if (getRndEnemyAdjaceTerri(the_own) != null && the_own.armyStrength > 1) {
                 the_enemy = getRndEnemyAdjaceTerri(the_own);
-                attack(the_own, the_enemy);
+                boolean attackSuccessful = attack(the_own, the_enemy);
+
+                if (attackSuccessful) {
+                    if (checkWinCondition(kiPlayers[0])) {
+                        System.out.println("Game over!");
+                    }
+                }
             }
 
             attacks--;
@@ -246,6 +260,9 @@ public class AllThoseTerritories {
         this.humanPlayers[0].updateLabel();
         this.kiPlayers[0].availableReinforcements = calc_reinforce(kiPlayers[0]);
         stepReinforcements = true;
+    }
+
+    private void endGame() {
     }
 
     //Is called when a territory is clicked.
@@ -322,6 +339,7 @@ public class AllThoseTerritories {
                         // variables for follow-up move
                         newlyObtainedLand = enemy;
                         sourceOfSuccessfulAttack = own;
+
                     }
                     //deselect after attack
                     own.setSelected(false);
