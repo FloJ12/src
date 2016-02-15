@@ -215,14 +215,37 @@ public class AllThoseTerritories {
         return territoryName;
     }
 
-    public boolean checkWinCondition(Player player) {
+    // Checks if a game is won by a player and returns the player
+    public Player isWon() {
         boolean result = true;
-        for (Map.Entry<String, Territory> entry: territories.entrySet()) {
+        // Get any TerritoryEntry of the map
+        Map.Entry<String, Territory> anyTerritoryEntry = territories.entrySet().iterator().next();
+        // Get its owner
+        Player player = anyTerritoryEntry.getValue().owned_by;
+        // Check if he/she/it owns every territory
+        for (Map.Entry<String, Territory> entry : territories.entrySet()) {
             result = result && entry.getValue().owned_by == player;
         }
-
-        return result;
+        if(result == true) {
+            return player;
+        }
+        else {
+            return null;
+        }
     }
+
+    // Returns true iff user owns all territories
+    private boolean isWon(Player user) {
+        // Iterate over whole Map
+        for (Map.Entry<String, Territory> entry : territories.entrySet()) {
+            Territory territory = entry.getValue();
+            if (territory.owned_by == user) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void endTurn() {
         System.out.println("Button pressed");
         // computer attack & reinforcements and new turn
@@ -246,14 +269,12 @@ public class AllThoseTerritories {
                 boolean attackSuccessful = attack(the_own, the_enemy);
 
                 if (attackSuccessful) {
-                    if (checkWinCondition(kiPlayers[0])) {
-                        System.out.println("Game over!");
+                    if (isWon(the_own.owned_by)) {
+                        endGame(the_own.owned_by);
                     }
                 }
             }
-
             attacks--;
-
         }
 
         this.humanPlayers[0].availableReinforcements = calc_reinforce(humanPlayers[0]);
@@ -262,7 +283,9 @@ public class AllThoseTerritories {
         stepReinforcements = true;
     }
 
-    private void endGame() {
+    private void endGame(Player winner) {
+        System.out.println("Game over");
+        System.out.println(winner + " won the Game.");
     }
 
     //Is called when a territory is clicked.
@@ -312,7 +335,7 @@ public class AllThoseTerritories {
             else if(stepAttackAndMove) {
                 // when own territory is clicked
                 if (territory.owned_by == this.humanPlayers[0]) {
-                    //if no territory, selected
+                    //if no territory is selected
                     if (own == null) {
                         own = territory;
                         own.setSelected(true);
@@ -330,16 +353,18 @@ public class AllThoseTerritories {
                     }
                 }
                 // when enemy territory is clicked
-                // attack if: 1) base selected, 2)enemy is neighbour of base, 3) base armyStrength > 1
-                else if (own != null && own.isNeighbor(territory) && own.armyStrength > 1 && territory.owned_by == this.kiPlayers[0]) {
+                // attack if: 1) base selected, 2) enemy is neighbour of base, 3) base armyStrength > 1
+                else if (own != null && own.isNeighbor(territory) && own.armyStrength > 1 && territory.owned_by != own.owned_by) {
                     enemy = territory;
                     enemy.setSelected(true);
                     boolean successfulAttack = attack(own, enemy);
                     if (successfulAttack) {
                         // variables for follow-up move
+                        if (isWon(own.owned_by)) {
+                            endGame(own.owned_by);
+                        }
                         newlyObtainedLand = enemy;
                         sourceOfSuccessfulAttack = own;
-
                     }
                     //deselect after attack
                     own.setSelected(false);
@@ -406,6 +431,7 @@ public class AllThoseTerritories {
         // attack not successful
         return false;
     }
+
     private int calc_reinforce(Player player) {
         int result = 0;
         for (Map.Entry<String, Continent> entry : continents.entrySet()) {
@@ -526,18 +552,6 @@ public class AllThoseTerritories {
         return isWon(null);
     }
 
-    // Returns true iff user owns all territories
-    private boolean isWon(Player user) {
-        // Iterate over whole Map
-        for (Map.Entry<String, Territory> entry : territories.entrySet()) {
-            Territory territory = entry.getValue();
-            if (territory.owned_by == user) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public void addAllToGUI(Group g) {
         // First the connecting lines between neighbors, so that those of land-neighbors are later hidden
         // by the land-polygons
@@ -566,8 +580,8 @@ public class AllThoseTerritories {
 
 
     public void territoryRightClicked(Territory territory) {
-        // normal move, if 1) selected base, 2) base armyStrength > 1, 3) no move happened before
-        if (own != null && own.armyStrength > 1 && own.isNeighbor(territory) && sourceOfMovedTroups == null && destOfMovedTroups == null && territory != newlyObtainedLand) {
+        // normal move, if 1) selected base, 2) selected own second territory 3) base armyStrength > 1, 4) no move happened before
+        if (own != null && territory.owned_by == humanPlayers[0] && own.armyStrength > 1 && own.isNeighbor(territory) && sourceOfMovedTroups == null && destOfMovedTroups == null && territory != newlyObtainedLand) {
             sourceOfMovedTroups = own;
             destOfMovedTroups = territory;
             move(sourceOfMovedTroups, destOfMovedTroups);
@@ -578,7 +592,7 @@ public class AllThoseTerritories {
             sourceOfMovedTroups = null;
             destOfMovedTroups = null;
         }
-        // follow-up move
+        // follow-up move after attack
         else if (territory == newlyObtainedLand && sourceOfSuccessfulAttack.armyStrength > 1) {
             move(sourceOfSuccessfulAttack, newlyObtainedLand);
         }
