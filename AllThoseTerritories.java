@@ -344,21 +344,14 @@ public class AllThoseTerritories {
                     this.kiPlayer.availableReinforcements = calc_reinforce(kiPlayer);
                 }
             }
-        } else if (phaseConqer) {
-            if(stepReinforcements) {
-<<<<<<< HEAD
+        }
+        else if (phaseConqer) {
+            if (stepReinforcements) {
                 this.humanPlayer.deployReinforcement(territory);
-                if(this.humanPlayer.availableReinforcements == 0) {
+                status2.setText("Reinforcement in " + territory + " deployed.");
+                if (this.humanPlayer.availableReinforcements == 0) {
                     while (this.kiPlayer.availableReinforcements > 0) {
                         Territory rndTerri = kiPlayer.getRandomOwndTerritory();
-=======
-                this.humanPlayers[0].deployReinforcement(territory);
-                status2.setText("Reinforcement in " + territory + " deployed.");
-                if(this.humanPlayers[0].availableReinforcements == 0) {
-                    while (this.kiPlayers[0].availableReinforcements > 0) {
-                        Territory rndTerri = kiPlayers[0].getRandomOwndTerritory();
->>>>>>> f35ed9017a05539988c8a3ee2a978fe55b2f8546
-
                         if (getRndEnemyAdjaceTerri(rndTerri) != null) {
                             rndTerri.changeArmyStrength(1);
                             kiPlayer.availableReinforcements--;
@@ -369,8 +362,7 @@ public class AllThoseTerritories {
                     stepAttackAndMove = true;
                     status.setText("Attack or move: Select one of your territories by left-clicking.");
                 }
-            }
-            else if(stepAttackAndMove) {
+            } else if (stepAttackAndMove) {
                 // when own territory is clicked
                 if (territory.owned_by == this.humanPlayer) {
                     //if no territory is selected yet
@@ -410,8 +402,7 @@ public class AllThoseTerritories {
                         status.setText("Successfully attacked " + enemy + "! You can move remaining armies to your new territory by right-clicking on it.");
                         newlyObtainedLand = enemy;
                         sourceOfSuccessfulAttack = own;
-                    }
-                    else {
+                    } else {
                         status.setText("Attack defeated!");
                     }
                     //deselect after attack
@@ -610,10 +601,10 @@ public class AllThoseTerritories {
             destOfMovedTroups = territory;
             move(sourceOfMovedTroups, destOfMovedTroups);
         }
-        else if (own == null) {
+        else if (own == null && !(territory == newlyObtainedLand)) {
             status.setText("No base territory selected!");
         }
-        else if (own != null && territory.owned_by != humanPlayers[0]) {
+        else if (own != null && territory.owned_by != humanPlayer) {
             status.setText("You can only move armies between own territories!");
         }
         else if (own != null && !own.isNeighbor(territory)) {
@@ -639,6 +630,9 @@ public class AllThoseTerritories {
             else {
                 move(sourceOfSuccessfulAttack, newlyObtainedLand);
             }
+        }
+        else if (sourceOfSuccessfulAttack.armyStrength == 1) {
+            status.setText("You cannot move your last army!");
         }
     }
 
