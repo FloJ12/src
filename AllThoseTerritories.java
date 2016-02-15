@@ -244,11 +244,22 @@ public class AllThoseTerritories {
         // Iterate over whole Map
         for (Map.Entry<String, Territory> entry : territories.entrySet()) {
             Territory territory = entry.getValue();
-            if (territory.owned_by == user) {
+            if (!(territory.owned_by == user)) {
                 return false;
             }
         }
         return true;
+    }
+
+    private boolean ownsATerritory(Player user) {
+        // Iterate over whole Map
+        for (Map.Entry<String, Territory> entry : territories.entrySet()) {
+            Territory territory = entry.getValue();
+            if (territory.owned_by == user) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void endTurn() {
@@ -524,7 +535,7 @@ public class AllThoseTerritories {
 
     // Returns true iff all Territories of the game are occupied by a user
     private boolean allOccupied() {
-        return isWon(null);
+        return !ownsATerritory(null);
     }
 
     public void addAllToGUI(Group g) {
