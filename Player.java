@@ -42,6 +42,10 @@ public class Player {
         label.relocate(480, 595);
     }
 
+    public void setLabelInvisible() {
+        this.reinforce_status.setVisible(false);
+    }
+
     public String toString() {
         return name;
     }
