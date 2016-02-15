@@ -242,12 +242,13 @@ public class AllThoseTerritories {
     // Returns true iff user owns all territories
     private boolean isWon(Player user) {
         // Iterate over whole Map
-        boolean result = true;
         for (Map.Entry<String, Territory> entry : territories.entrySet()) {
             Territory territory = entry.getValue();
-            result = result && territory.owned_by == user;
+            if (territory.owned_by == user) {
+                return false;
+            }
         }
-        return result;
+        return true;
     }
 
     public void endTurn() {
