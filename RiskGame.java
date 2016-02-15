@@ -56,7 +56,7 @@ public class RiskGame extends Application {
 
         Label status = new Label();
         game.addLabel(status);
-        Button btn = new Button("Zug beenden");
+        Button btn = new Button("End Turn");
         Label reinforce_status = new Label("Available reinforcements: " + game.getHumanPlayers()[0].availableReinforcements);
         game.addGameElements(btn, reinforce_status);
         g.getChildren().addAll(btn, reinforce_status, status);

@@ -251,6 +251,7 @@ public class AllThoseTerritories {
         return true;
     }
 
+    // Returns true iff user owns any territory
     private boolean ownsATerritory(Player user) {
         // Iterate over whole Map
         for (Map.Entry<String, Territory> entry : territories.entrySet()) {
@@ -311,13 +312,13 @@ public class AllThoseTerritories {
                 // Human selection
                 territory.setOwner(humanPlayers[0]);
                 territory.changeArmyStrength(1);
-                System.out.println(territory.name + " is now owned by " + territory.owned_by);
+                status.setText(territory + " is now owned by " + territory.owned_by);
 
                 // KI selection
                 Territory randomTerritory =  getRandomUnoccupiedTerritory();
                 randomTerritory.setOwner(kiPlayers[0]);
                 randomTerritory.changeArmyStrength(1);
-                System.out.println(randomTerritory.name + " is now owned by " + randomTerritory.owned_by);
+                status.setText(randomTerritory.name + " is now owned by " + randomTerritory.owned_by);
 
                 // if no territories are available any more, start conquer phase
                 if (allOccupied()) {
@@ -326,18 +327,16 @@ public class AllThoseTerritories {
                     // Erste Verstärkungen ermitteln
                     this.humanPlayers[0].availableReinforcements = calc_reinforce(humanPlayers[0]);
                     this.humanPlayers[0].updateLabel();
+                    status.setText("Reinforcements: Deploy your available reinforcements in your territories by left-clicking.");
                     btn.setVisible(true);
 
                     this.kiPlayers[0].availableReinforcements = calc_reinforce(kiPlayers[0]);
                 }
             }
         } else if (phaseConqer) {
-            // System.out.println("Start: Conquer");
             if(stepReinforcements) {
+                this.humanPlayers[0].deployReinforcement(territory);
                 if(this.humanPlayers[0].availableReinforcements == 0) {
-
-                    stepReinforcements = false;
-
                     while (this.kiPlayers[0].availableReinforcements > 0) {
                         Territory rndTerri = kiPlayers[0].getRandomOwndTerritory();
 
@@ -347,29 +346,31 @@ public class AllThoseTerritories {
                         }
 
                     }
+                    stepReinforcements = false;
                     stepAttackAndMove = true;
-                }
-                else {
-                    this.humanPlayers[0].deployReinforcement(territory);
+                    status.setText("Attack or move: Select one of your territories by left-clicking.");
                 }
             }
             else if(stepAttackAndMove) {
                 // when own territory is clicked
                 if (territory.owned_by == this.humanPlayers[0]) {
-                    //if no territory is selected
+                    //if no territory is selected yet
                     if (own == null) {
                         own = territory;
                         own.setSelected(true);
+                        status.setText(own + " selected. Attack by left-clicking on enemy territory. Move army by right-clicking on own territory.");
                     }
                     // switch selected territory
                     else if (own != territory) {
                         own.setSelected(false); // is old selected territory, deselect
                         own = territory; // set selected territory
                         own.setSelected(true);
+                        status.setText(own + " selected. Attack by left-clicking on enemy territory. Move army by right-clicking on own territory.");
                     }
                     // deselect
                     else if (own == territory) {
                         own.setSelected(false);
+                        status.setText(own + " deselected. Select another own territory by left-clicking.");
                         own = null;
                     }
                 }
@@ -378,6 +379,7 @@ public class AllThoseTerritories {
                 else if (own != null && own.isNeighbor(territory) && own.armyStrength > 1 && territory.owned_by != own.owned_by) {
                     enemy = territory;
                     enemy.setSelected(true);
+                    status.setText("Attack " + enemy + "!");
                     boolean successfulAttack = attack(own, enemy);
                     if (successfulAttack) {
                         // variables for follow-up move
@@ -588,7 +590,7 @@ public class AllThoseTerritories {
 
     public void addLabel(Label status) {
         this.status = status;
-        this.status.relocate(450, 620);
+        this.status.relocate(480, 620);
     }
 
     public void addGameElements(Button btn, Label reinforce_status) {

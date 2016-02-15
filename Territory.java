@@ -158,4 +158,8 @@ public class Territory {
         addLabel(lbl);
         g.getChildren().add(lbl);
     }
+
+    public String toString() {
+        return name;
+    }
 }
