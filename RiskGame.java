@@ -39,7 +39,7 @@ public class RiskGame extends Application {
         // Start new game
         Player user = new Player("User", true);
         Player ki = new Player("KI", false);
-        AllThoseTerritories game = new AllThoseTerritories(new Player[] {user}, new Player[] {ki}, pathToMap);
+        AllThoseTerritories game = new AllThoseTerritories(user, ki, pathToMap);
 
         Group root = new Group();
         Scene scene = new Scene(root, 1250, 650);
@@ -57,7 +57,7 @@ public class RiskGame extends Application {
         Label status2 = new Label();
         game.addStatus(status, status2);
         Button btn = new Button("End Turn");
-        Label reinforce_status = new Label("Available reinforcements: " + game.getHumanPlayers()[0].availableReinforcements);
+        Label reinforce_status = new Label("Available reinforcements: " + game.getHumanPlayer().availableReinforcements);
         game.addGameElements(btn, reinforce_status);
         g.getChildren().addAll(btn, reinforce_status, status, status2);
 

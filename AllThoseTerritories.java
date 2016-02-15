@@ -5,6 +5,12 @@
  * of the command line parameter.
  * There is also the listener for mouseclicks on territories, so the user can control his moves.
  * Created by nam on 08.01.16.
+ * 
+ * 
+ * kommentare zu klassen
+ * reduce complexity (players, ...)
+ * uml
+ * reset move
  */
 
 import javafx.animation.KeyFrame;
@@ -26,8 +32,8 @@ public class AllThoseTerritories {
 
     private Map<String, Territory> territories;
     private Map<String, Continent> continents;
-    private Player[] humanPlayers;
-    private Player[] kiPlayers;
+    private Player humanPlayer;
+    private Player kiPlayer;
     private boolean phaseOccupy;
     private boolean phaseConqer;
     private boolean stepReinforcements = true;
@@ -42,11 +48,11 @@ public class AllThoseTerritories {
     private Territory newlyObtainedLand;
     private Territory sourceOfSuccessfulAttack;
 
-    public AllThoseTerritories(Player[] humanPlayers, Player[] kiPlayers, String pathToMap) {
+    public AllThoseTerritories(Player humanPlayer, Player kiPlayer, String pathToMap) {
         this.territories = readTerritories(pathToMap);
         this.continents = readContinents(pathToMap);
-        this.humanPlayers = humanPlayers;
-        this.kiPlayers = kiPlayers;
+        this.humanPlayer = humanPlayer;
+        this.kiPlayer = kiPlayer;
     }
 
     // Returns a Map containing all Territories. By doing this,
@@ -272,13 +278,13 @@ public class AllThoseTerritories {
         stepAttackAndMove = false;
         int attacks = (int) (Math.random() * 100);
 
-        Territory the_own = kiPlayers[0].getRandomOwndTerritory();
+        Territory the_own = kiPlayer.getRandomOwndTerritory();
         Territory the_enemy;
         while (attacks > 0) {
             // search for attack opportunities
             do {
                 the_own = getRndEnemyAdjaceTerri(the_own) != null
-                        && the_own.armyStrength > 1 ? the_own: kiPlayers[0].getRandomOwndTerritory();
+                        && the_own.armyStrength > 1 ? the_own: kiPlayer.getRandomOwndTerritory();
                 attacks--;
 
             } while (getRndEnemyAdjaceTerri(the_own) == null && attacks > 0);
@@ -297,10 +303,11 @@ public class AllThoseTerritories {
             attacks--;
         }
 
-        this.humanPlayers[0].availableReinforcements = calc_reinforce(humanPlayers[0]);
-        this.humanPlayers[0].updateLabel();
-        this.kiPlayers[0].availableReinforcements = calc_reinforce(kiPlayers[0]);
+        this.humanPlayer.availableReinforcements = calc_reinforce(humanPlayer);
+        this.humanPlayer.updateLabel();
+        this.kiPlayer.availableReinforcements = calc_reinforce(kiPlayer);
         stepReinforcements = true;
+        sourceOfMovedTroups = destOfMovedTroups = null;
     }
 
     private void endGame(Player winner) {
@@ -314,12 +321,12 @@ public class AllThoseTerritories {
             // Only call code if clicked territory is not owned by someone else
             if (territory.owned_by == null) {
                 // Human selection
-                territory.setOwner(humanPlayers[0]);
+                territory.setOwner(humanPlayer);
                 territory.changeArmyStrength(1);
 
                 // KI selection
                 Territory randomTerritory =  getRandomUnoccupiedTerritory();
-                randomTerritory.setOwner(kiPlayers[0]);
+                randomTerritory.setOwner(kiPlayer);
                 randomTerritory.changeArmyStrength(1);
                 status2.setText(territory + " is now owned by " + territory.owned_by + ", " + randomTerritory + " is now owned by " + randomTerritory.owned_by);
 
@@ -328,26 +335,33 @@ public class AllThoseTerritories {
                     phaseOccupy = false;
                     phaseConqer = true;
                     // Erste Verstärkungen ermitteln
-                    this.humanPlayers[0].availableReinforcements = calc_reinforce(humanPlayers[0]);
-                    this.humanPlayers[0].updateLabel();
+                    this.humanPlayer.availableReinforcements = calc_reinforce(humanPlayer);
+                    this.humanPlayer.updateLabel();
                     status.setText("Reinforcements: Deploy your available reinforcements in your territories by left-clicking.");
                     status2.setText("");
                     btn.setVisible(true);
 
-                    this.kiPlayers[0].availableReinforcements = calc_reinforce(kiPlayers[0]);
+                    this.kiPlayer.availableReinforcements = calc_reinforce(kiPlayer);
                 }
             }
         } else if (phaseConqer) {
             if(stepReinforcements) {
+<<<<<<< HEAD
+                this.humanPlayer.deployReinforcement(territory);
+                if(this.humanPlayer.availableReinforcements == 0) {
+                    while (this.kiPlayer.availableReinforcements > 0) {
+                        Territory rndTerri = kiPlayer.getRandomOwndTerritory();
+=======
                 this.humanPlayers[0].deployReinforcement(territory);
                 status2.setText("Reinforcement in " + territory + " deployed.");
                 if(this.humanPlayers[0].availableReinforcements == 0) {
                     while (this.kiPlayers[0].availableReinforcements > 0) {
                         Territory rndTerri = kiPlayers[0].getRandomOwndTerritory();
+>>>>>>> f35ed9017a05539988c8a3ee2a978fe55b2f8546
 
                         if (getRndEnemyAdjaceTerri(rndTerri) != null) {
                             rndTerri.changeArmyStrength(1);
-                            kiPlayers[0].availableReinforcements--;
+                            kiPlayer.availableReinforcements--;
                         }
                     }
                     status2.setText("");
@@ -358,7 +372,7 @@ public class AllThoseTerritories {
             }
             else if(stepAttackAndMove) {
                 // when own territory is clicked
-                if (territory.owned_by == this.humanPlayers[0]) {
+                if (territory.owned_by == this.humanPlayer) {
                     //if no territory is selected yet
                     if (own == null) {
                         own = territory;
@@ -522,7 +536,7 @@ public class AllThoseTerritories {
         List<Territory> keys = new ArrayList<Territory>();
         for (Map.Entry<String, Territory> entry : this.getTerritoriesMap().entrySet()) {
 
-            if (entry.getValue().owned_by == humanPlayers[0] && entry.getValue().isNeighbor(center)) {
+            if (entry.getValue().owned_by == humanPlayer && entry.getValue().isNeighbor(center)) {
                 keys.add(entry.getValue());
             }
         }
@@ -543,23 +557,21 @@ public class AllThoseTerritories {
         return continents;
     }
 
-    public Player[] getHumanPlayers() {
-        return humanPlayers;
+    public Player getHumanPlayer() {
+        return humanPlayer;
     }
 
-    public Player[] getKiPlayers() {
-        return kiPlayers;
-    }
+     public Player getKiPlayer() {return kiPlayer;}
 
-    //Returns an array containing human players first and then KI players
-    public Player[] getPlayers() {
-        int aLen = getHumanPlayers().length;
-        int bLen = getKiPlayers().length;
+    // Returns an array containing human players first and then KI players
+    /* public Player[] getPlayers() {
+        int aLen = getHumanPlayer().length;
+        int bLen = getKiPlayer().length;
         Player[] c = new Player[aLen+bLen];
         System.arraycopy(getHumanPlayers(), 0, c, 0, aLen);
         System.arraycopy(getKiPlayers(), 0, c, aLen, bLen);
         return c;
-    }
+    } */
 
     // Returns true iff all Territories of the game are occupied by a user
     private boolean allOccupied() {
@@ -593,7 +605,7 @@ public class AllThoseTerritories {
 
     public void territoryRightClicked(Territory territory) {
         // normal move, if 1) selected base, 2) selected own second territory 3) base armyStrength > 1, 4) no move happened before
-        if (own != null && territory.owned_by == humanPlayers[0] && own.armyStrength > 1 && own.isNeighbor(territory) && sourceOfMovedTroups == null && destOfMovedTroups == null && territory != newlyObtainedLand) {
+        if (own != null && territory.owned_by == humanPlayer && own.armyStrength > 1 && own.isNeighbor(territory) && sourceOfMovedTroups == null && destOfMovedTroups == null && territory != newlyObtainedLand) {
             sourceOfMovedTroups = own;
             destOfMovedTroups = territory;
             move(sourceOfMovedTroups, destOfMovedTroups);
@@ -639,7 +651,7 @@ public class AllThoseTerritories {
 
     public void addGameElements(Button btn, Label reinforce_status) {
         this.btn = btn;
-        humanPlayers[0].addLabel(reinforce_status);
+        humanPlayer.addLabel(reinforce_status);
         btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
