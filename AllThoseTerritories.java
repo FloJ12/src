@@ -252,7 +252,7 @@ public class AllThoseTerritories {
         // Iterate over whole Map
         for (Map.Entry<String, Territory> entry : territories.entrySet()) {
             Territory territory = entry.getValue();
-            if (!(territory.owned_by == user)) {
+            if (territory.owned_by != user) {
                 return false;
             }
         }
@@ -272,6 +272,7 @@ public class AllThoseTerritories {
     }
 
     public void endTurn() {
+        btn.setVisible(false);
         // computer attack & reinforcements and new turn
         stepAttackAndMove = false;
         int attacks = (int) (Math.random() * 100);
@@ -295,6 +296,7 @@ public class AllThoseTerritories {
                 if (attackSuccessful) {
                     if (isWon(the_own.owned_by)) {
                         endGame(the_own.owned_by);
+                        return;
                     }
                 }
             }
@@ -339,7 +341,6 @@ public class AllThoseTerritories {
                     this.humanPlayer.updateLabel();
                     status.setText("Reinforcements: Deploy your available reinforcements in your territories by left-clicking.");
                     status2.setText("");
-                    btn.setVisible(true);
 
                     this.kiPlayer.availableReinforcements = calc_reinforce(kiPlayer);
                 }
@@ -361,6 +362,7 @@ public class AllThoseTerritories {
                     stepReinforcements = false;
                     humanPlayer.setLabelInvisible();
                     stepAttackAndMove = true;
+                    btn.setVisible(true);
                     status.setText("Attack or move: Select one of your territories by left-clicking.");
                 }
             } else if (stepAttackAndMove) {
@@ -399,6 +401,7 @@ public class AllThoseTerritories {
                         // variables for follow-up move
                         if (isWon(own.owned_by)) {
                             endGame(own.owned_by);
+                            return;
                         }
                         status.setText("Successfully attacked " + enemy + "! You can move remaining armies to your new territory by right-clicking on it.");
                         newlyObtainedLand = enemy;
@@ -411,7 +414,6 @@ public class AllThoseTerritories {
                     own = null;
                     enemy.setSelected(false);
                     enemy = null;
-
                 }
             }
         }
@@ -479,6 +481,9 @@ public class AllThoseTerritories {
             move(attackers, own, enemy);
             enemy.setOwner(own.owned_by);
             countFollowUpArmies = own.armyStrength - 1;
+            if (isWon(own.owned_by)) {
+                endGame(own.owned_by);
+            }
             return true;
         }
         // attack not successful
@@ -653,7 +658,7 @@ public class AllThoseTerritories {
             }
         });
         btn.relocate(355, 600);
-        btn.setVisible(true);
+        btn.setVisible(false);
     }
 }
 
