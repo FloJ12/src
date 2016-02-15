@@ -54,17 +54,12 @@ public class RiskGame extends Application {
         Color[] colors = {Color.VIOLET, Color.GREEN, Color.ORANGE, Color.BLACK, Color.YELLOW, Color.BROWN};
         game.paintContinentBorders(colors);
 
+        Label status = new Label();
+        game.addLabel(status);
         Button btn = new Button("Zug beenden");
         Label reinforce_status = new Label("Available reinforcements: " + game.getHumanPlayers()[0].availableReinforcements);
-        game.getHumanPlayers()[0].addLabel(reinforce_status);
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                game.endTurn();
-            }
-        });
-        btn.relocate(600, 550);
-        g.getChildren().addAll(btn, reinforce_status);
+        game.addGameElements(btn, reinforce_status);
+        g.getChildren().addAll(btn, reinforce_status, status);
 
         scene.setRoot(g);
         stage.show();
