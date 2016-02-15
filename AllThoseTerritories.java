@@ -589,8 +589,8 @@ public class AllThoseTerritories {
                 endTurn();
             }
         });
-        btn.relocate(600, 550);
-        btn.setVisible(false);
+        btn.relocate(355, 610);
+        btn.setVisible(true);
     }
 }
 

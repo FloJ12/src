@@ -39,7 +39,7 @@ public class Player {
     public void addLabel(Label label) {
         this.reinforce_status = label;
         reinforce_status.setVisible(false);
-        label.relocate(540, 600);
+        label.relocate(450, 605);
     }
 
     public String toString() {
