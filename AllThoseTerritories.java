@@ -13,12 +13,15 @@
  * reset move
  */
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -36,6 +39,7 @@ public class AllThoseTerritories {
     private boolean stepReinforcements = true;
     private boolean stepAttackAndMove = false;
     private Label status;
+    private Label status2;
     private Button btn;
     private Territory own;
     private Territory sourceOfMovedTroups;
@@ -319,13 +323,12 @@ public class AllThoseTerritories {
                 // Human selection
                 territory.setOwner(humanPlayer);
                 territory.changeArmyStrength(1);
-                status.setText(territory + " is now owned by " + territory.owned_by);
 
                 // KI selection
                 Territory randomTerritory =  getRandomUnoccupiedTerritory();
                 randomTerritory.setOwner(kiPlayer);
                 randomTerritory.changeArmyStrength(1);
-                status.setText(randomTerritory.name + " is now owned by " + randomTerritory.owned_by);
+                status2.setText(territory + " is now owned by " + territory.owned_by + ", " + randomTerritory + " is now owned by " + randomTerritory.owned_by);
 
                 // if no territories are available any more, start conquer phase
                 if (allOccupied()) {
@@ -335,6 +338,7 @@ public class AllThoseTerritories {
                     this.humanPlayer.availableReinforcements = calc_reinforce(humanPlayer);
                     this.humanPlayer.updateLabel();
                     status.setText("Reinforcements: Deploy your available reinforcements in your territories by left-clicking.");
+                    status2.setText("");
                     btn.setVisible(true);
 
                     this.kiPlayer.availableReinforcements = calc_reinforce(kiPlayer);
@@ -342,17 +346,25 @@ public class AllThoseTerritories {
             }
         } else if (phaseConqer) {
             if(stepReinforcements) {
+<<<<<<< HEAD
                 this.humanPlayer.deployReinforcement(territory);
                 if(this.humanPlayer.availableReinforcements == 0) {
                     while (this.kiPlayer.availableReinforcements > 0) {
                         Territory rndTerri = kiPlayer.getRandomOwndTerritory();
+=======
+                this.humanPlayers[0].deployReinforcement(territory);
+                status2.setText("Reinforcement in " + territory + " deployed.");
+                if(this.humanPlayers[0].availableReinforcements == 0) {
+                    while (this.kiPlayers[0].availableReinforcements > 0) {
+                        Territory rndTerri = kiPlayers[0].getRandomOwndTerritory();
+>>>>>>> f35ed9017a05539988c8a3ee2a978fe55b2f8546
 
                         if (getRndEnemyAdjaceTerri(rndTerri) != null) {
                             rndTerri.changeArmyStrength(1);
                             kiPlayer.availableReinforcements--;
                         }
-
                     }
+                    status2.setText("");
                     stepReinforcements = false;
                     stepAttackAndMove = true;
                     status.setText("Attack or move: Select one of your territories by left-clicking.");
@@ -386,15 +398,18 @@ public class AllThoseTerritories {
                 else if (own != null && own.isNeighbor(territory) && own.armyStrength > 1 && territory.owned_by != own.owned_by) {
                     enemy = territory;
                     enemy.setSelected(true);
-                    status.setText("Attack " + enemy + "!");
                     boolean successfulAttack = attack(own, enemy);
                     if (successfulAttack) {
                         // variables for follow-up move
                         if (isWon(own.owned_by)) {
                             endGame(own.owned_by);
                         }
+                        status.setText("Successfully attacked " + enemy + "! You can move remaining armies to your new territory by right-clicking on it.");
                         newlyObtainedLand = enemy;
                         sourceOfSuccessfulAttack = own;
+                    }
+                    else {
+                        status.setText("Attack defeated!");
                     }
                     //deselect after attack
                     own.setSelected(false);
@@ -412,6 +427,7 @@ public class AllThoseTerritories {
             source.changeArmyStrength(-1);
             dest.changeArmyStrength(1);
         }
+        status.setText("Army moved from " + source + " to " + dest);
     }
 
     public void move(int countArmies, Territory source, Territory dest) {
@@ -426,16 +442,27 @@ public class AllThoseTerritories {
         int[] atk_dice = new int[attackers];
         int[] def_dice = new int[defenders];
 
+        StringBuilder status2String = new StringBuilder("Dices ATK: ");
         for (int i = 0; i < atk_dice.length; i++) {
             atk_dice[i] = (int) (Math.random() * 6) + 1;
-            System.out.println("Würfel ATK: " + atk_dice[i]);
+            status2String.append(atk_dice[i]);
+            if(i != atk_dice.length - 1) {
+                status2String.append(", ");
+            }
+            else {
+                status2String.append(" ");
+            }
         }
 
+        status2String.append("Dices DEF: ");
         for (int i = 0; i < def_dice.length; i++) {
             def_dice[i] = (int) (Math.random() * 6) + 1;
-            System.out.println("Würfel DEF: " + def_dice[i]);
+            status2String.append(def_dice[i]);
+            if(i != def_dice.length - 1) {
+                status2String.append(", ");
+            }
         }
-
+        status2.setText(status2String.toString());
         Arrays.sort(atk_dice);
         Arrays.sort(def_dice);
 
@@ -480,6 +507,9 @@ public class AllThoseTerritories {
     }
 
     public void start() {
+        if(status == null || status2 == null || btn == null) {
+            System.err.println("GUI for game not fully initialised.");;
+        }
         this.phaseOccupy = true;
         status.setText("Occupy Phase: Select your desired territories by left-clicking.");
     }
@@ -577,6 +607,21 @@ public class AllThoseTerritories {
             destOfMovedTroups = territory;
             move(sourceOfMovedTroups, destOfMovedTroups);
         }
+        else if (own == null) {
+            status.setText("No base territory selected!");
+        }
+        else if (own != null && territory.owned_by != humanPlayers[0]) {
+            status.setText("You can only move armies between own territories!");
+        }
+        else if (own != null && !own.isNeighbor(territory)) {
+            status.setText("You can only move armies to neighbor territories!");
+        }
+        else if (own != null && own.armyStrength == 1) {
+            status.setText("You cannot move your last army from your territory!");
+        }
+        else if (own != null && sourceOfMovedTroups != null) {
+            status.setText("You already moved an army. You can undo this by left-clicking on " + destOfMovedTroups + " then right-clicking on + " + sourceOfMovedTroups);
+        }
         // move happened, undo move
         else if (own == destOfMovedTroups && territory == sourceOfMovedTroups) {
             move(destOfMovedTroups, sourceOfMovedTroups);
@@ -593,9 +638,11 @@ public class AllThoseTerritories {
         }
     }
 
-    public void addLabel(Label status) {
+    public void addStatus(Label status, Label status2) {
         this.status = status;
-        this.status.relocate(480, 620);
+        this.status.relocate(480, 610);
+        this.status2 = status2;
+        this.status2.relocate(480, 625);
     }
 
     public void addGameElements(Button btn, Label reinforce_status) {
@@ -607,7 +654,7 @@ public class AllThoseTerritories {
                 endTurn();
             }
         });
-        btn.relocate(355, 610);
+        btn.relocate(355, 600);
         btn.setVisible(true);
     }
 }
