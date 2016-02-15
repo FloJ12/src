@@ -370,6 +370,7 @@ public class AllThoseTerritories {
                         own = territory;
                         own.setSelected(true);
                         status.setText(own + " selected. Attack by left-clicking on enemy territory. Move army by right-clicking on own territory.");
+                        status2.setText("");
                     }
                     // switch selected territory
                     else if (own != territory) {
@@ -377,11 +378,13 @@ public class AllThoseTerritories {
                         own = territory; // set selected territory
                         own.setSelected(true);
                         status.setText(own + " selected. Attack by left-clicking on enemy territory. Move army by right-clicking on own territory.");
+                        status2.setText("");
                     }
                     // deselect
                     else if (own == territory) {
                         own.setSelected(false);
                         status.setText(own + " deselected. Select another own territory by left-clicking.");
+                        status2.setText("");
                         own = null;
                     }
                 }
@@ -616,6 +619,7 @@ public class AllThoseTerritories {
         // move happened, undo move
         else if (own == destOfMovedTroups && territory == sourceOfMovedTroups) {
             move(destOfMovedTroups, sourceOfMovedTroups);
+            status.setText("");
             sourceOfMovedTroups = null;
             destOfMovedTroups = null;
         }
