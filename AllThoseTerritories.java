@@ -323,8 +323,13 @@ public class AllThoseTerritories {
                     stepReinforcements = false;
 
                     while (this.kiPlayers[0].availableReinforcements > 0) {
-                        kiPlayers[0].getRandomOwndTerritory().changeArmyStrength(1);
-                        kiPlayers[0].availableReinforcements--;
+                        Territory rndTerri = kiPlayers[0].getRandomOwndTerritory();
+
+                        if (getRndEnemyAdjaceTerri(rndTerri) != null) {
+                            rndTerri.changeArmyStrength(1);
+                            kiPlayers[0].availableReinforcements--;
+                        }
+
                     }
                     stepAttackAndMove = true;
                 }
