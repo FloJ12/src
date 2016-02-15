@@ -13,15 +13,12 @@
  * reset move
  */
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
-import javafx.util.Duration;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -47,6 +44,7 @@ public class AllThoseTerritories {
     private Territory enemy;
     private Territory newlyObtainedLand;
     private Territory sourceOfSuccessfulAttack;
+    private int countFollowUpArmies;
 
     public AllThoseTerritories(Player humanPlayer, Player kiPlayer, String pathToMap) {
         this.territories = readTerritories(pathToMap);
@@ -477,6 +475,7 @@ public class AllThoseTerritories {
         if (enemy.armyStrength == 0) {
             move(attackers, own, enemy);
             enemy.setOwner(own.owned_by);
+            countFollowUpArmies = own.armyStrength - 1;
             return true;
         }
         // attack not successful
@@ -604,17 +603,17 @@ public class AllThoseTerritories {
         else if (own == null && !(territory == newlyObtainedLand)) {
             status.setText("No base territory selected!");
         }
-        else if (own != null && territory.owned_by != humanPlayer) {
+        else if (territory.owned_by != humanPlayer) {
             status.setText("You can only move armies between own territories!");
         }
-        else if (own != null && !own.isNeighbor(territory)) {
+        else if (!own.isNeighbor(territory)) {
             status.setText("You can only move armies to neighbor territories!");
         }
-        else if (own != null && own.armyStrength == 1) {
+        else if (own.armyStrength == 1) {
             status.setText("You cannot move your last army from your territory!");
         }
-        else if (own != null && sourceOfMovedTroups != null) {
-            status.setText("You already moved an army. You can undo this by left-clicking on " + destOfMovedTroups + " then right-clicking on + " + sourceOfMovedTroups);
+        else if (own != destOfMovedTroups && territory != sourceOfMovedTroups) {
+            status.setText("You already moved an army. You can undo this by left-clicking on " + destOfMovedTroups + " then right-clicking on " + sourceOfMovedTroups);
         }
         // move happened, undo move
         else if (own == destOfMovedTroups && territory == sourceOfMovedTroups) {
@@ -624,15 +623,13 @@ public class AllThoseTerritories {
             destOfMovedTroups = null;
         }
         // follow-up move after attack
-        else if (territory == newlyObtainedLand && sourceOfSuccessfulAttack.armyStrength > 1) {
-            // fixing bug: moving army in territory which made a successful attack => this army could be follow-upped (wrong)
-            if(destOfMovedTroups == sourceOfSuccessfulAttack && sourceOfSuccessfulAttack.armyStrength == 2) {}
-            else {
-                move(sourceOfSuccessfulAttack, newlyObtainedLand);
-            }
+        else if (territory == newlyObtainedLand && countFollowUpArmies > 0) {
+            move(sourceOfSuccessfulAttack, newlyObtainedLand);
+            countFollowUpArmies--;
+            status.setText("Army followed up after successful attack from " + own + " to " + newlyObtainedLand);
         }
-        else if (sourceOfSuccessfulAttack.armyStrength == 1) {
-            status.setText("You cannot move your last army!");
+        else if (countFollowUpArmies == 0 && sourceOfSuccessfulAttack.armyStrength == 2) {
+            status.setText("You cannot follow up an after the attack moved army!");
         }
     }
 
