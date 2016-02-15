@@ -7,7 +7,11 @@
  * Created by nam on 08.01.16.
  */
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 
 import java.io.BufferedReader;
@@ -25,7 +29,8 @@ public class AllThoseTerritories {
     private boolean phaseConqer;
     private boolean stepReinforcements = true;
     private boolean stepAttackAndMove = false;
-    private boolean isPlayersTurn = true;
+    private Label status;
+    private Button btn;
     private Territory own;
     private Territory sourceOfMovedTroups;
     private Territory destOfMovedTroups;
@@ -310,6 +315,7 @@ public class AllThoseTerritories {
                     // Erste Verstärkungen ermitteln
                     this.humanPlayers[0].availableReinforcements = calc_reinforce(humanPlayers[0]);
                     this.humanPlayers[0].updateLabel();
+                    btn.setVisible(true);
 
                     this.kiPlayers[0].availableReinforcements = calc_reinforce(kiPlayers[0]);
                 }
@@ -455,6 +461,7 @@ public class AllThoseTerritories {
 
     public void start() {
         this.phaseOccupy = true;
+        status.setText("Occupy Phase: Select your desired territories by left-clicking.");
     }
 
     //Returns a random unoccupied territory
@@ -545,8 +552,6 @@ public class AllThoseTerritories {
         }
     }
 
-
-
     public void territoryRightClicked(Territory territory) {
         // normal move, if 1) selected base, 2) selected own second territory 3) base armyStrength > 1, 4) no move happened before
         if (own != null && territory.owned_by == humanPlayers[0] && own.armyStrength > 1 && own.isNeighbor(territory) && sourceOfMovedTroups == null && destOfMovedTroups == null && territory != newlyObtainedLand) {
@@ -568,6 +573,24 @@ public class AllThoseTerritories {
                 move(sourceOfSuccessfulAttack, newlyObtainedLand);
             }
         }
+    }
+
+    public void addLabel(Label status) {
+        this.status = status;
+        this.status.relocate(450, 620);
+    }
+
+    public void addGameElements(Button btn, Label reinforce_status) {
+        this.btn = btn;
+        humanPlayers[0].addLabel(reinforce_status);
+        btn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                endTurn();
+            }
+        });
+        btn.relocate(600, 550);
+        btn.setVisible(false);
     }
 }
 

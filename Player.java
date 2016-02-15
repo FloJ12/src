@@ -21,7 +21,6 @@ public class Player {
         return owned_territories.get((int)(owned_territories.size() * Math.random()));
     }
 
-
     public void deployReinforcement(Territory t) {
         if(availableReinforcements > 0) {
             availableReinforcements--;
@@ -33,48 +32,18 @@ public class Player {
     }
 
     public void updateLabel() {
+        reinforce_status.setVisible(true);
         reinforce_status.setText("Available reinforcements: " + availableReinforcements);
     }
 
     public void addLabel(Label label) {
         this.reinforce_status = label;
-        updateLabel();
-        label.relocate(800, 600);
+        reinforce_status.setVisible(false);
+        label.relocate(540, 600);
     }
 
     public String toString() {
         return name;
-    }
-
-    public void occupy() {
-        // TODO: acquire an uncontested territory
-    }
-
-    public void attackAndMove() {
-        boolean turnCompleted = false;
-        boolean gameWon   = false;
-
-        while (!turnCompleted && !gameWon) {
-            // TODO: attacking and moving of armies
-            gameWon = checkIfGameWon();
-        }
-    }
-
-    public void deployReinforcements() {
-        availableReinforcements = checkCountOfReinforcements();
-        if (availableReinforcements > 0) {
-            // TODO: deploy reinforcements
-        }
-    }
-
-    private int checkCountOfReinforcements() {
-        // TODO: count territories owned by this player and calculate resulting available reinforcements
-        return 0;
-    }
-
-    private boolean checkIfGameWon() {
-        // TODO: check if all territories are owned by this player
-        return false;
     }
 
     public void addTerritory(Territory territory) {
