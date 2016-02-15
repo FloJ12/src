@@ -4,7 +4,6 @@
  */
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -55,11 +54,12 @@ public class RiskGame extends Application {
         game.paintContinentBorders(colors);
 
         Label status = new Label();
-        game.addLabel(status);
+        Label status2 = new Label();
+        game.addStatus(status, status2);
         Button btn = new Button("End Turn");
         Label reinforce_status = new Label("Available reinforcements: " + game.getHumanPlayers()[0].availableReinforcements);
         game.addGameElements(btn, reinforce_status);
-        g.getChildren().addAll(btn, reinforce_status, status);
+        g.getChildren().addAll(btn, reinforce_status, status, status2);
 
         scene.setRoot(g);
         stage.show();
