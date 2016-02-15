@@ -247,7 +247,6 @@ public class AllThoseTerritories {
     }
 
     public void endTurn() {
-        System.out.println("Button pressed");
         // computer attack & reinforcements and new turn
         stepAttackAndMove = false;
         int attacks = (int) (Math.random() * 100);
@@ -490,42 +489,6 @@ public class AllThoseTerritories {
 
     }
 
-    // May be outdated
-    public void phaseOccupy() {
-        // As long as not all territories are occupied, this phase continues
-        while(!allOccupied()) {
-            for(Player user : humanPlayers) {
-                user.occupy();
-            }
-            for(Player ki : kiPlayers) {
-                ki.occupy();
-            }
-        }
-    }
-
-    // May be outdated
-    public void phaseConquer() {
-        // As long as the game is not won, this phase continues
-        // Parameter for isWon(Player player) can be anybody who owns a territory
-        // Get any entry from the Map (http://stackoverflow.com/questions/1509391/how-to-get-the-one-entry-from-hashmap-without-iterating)
-        Map.Entry<String, Territory> random_entry = territories.entrySet().iterator().next();
-        Territory random_territory = random_entry.getValue();
-        while(!isWon(random_territory.owned_by)) {
-            for (Player user : humanPlayers) {
-                user.deployReinforcements();
-            }
-            for (Player ki : kiPlayers) {
-                ki.deployReinforcements();
-            }
-            for (Player user : humanPlayers) {
-                user.attackAndMove();
-            }
-            for (Player ki : kiPlayers) {
-                ki.attackAndMove();
-            }
-        }
-    }
-
     public Map<String, Territory> getTerritoriesMap() {
         return territories;
     }
@@ -599,7 +562,11 @@ public class AllThoseTerritories {
         }
         // follow-up move after attack
         else if (territory == newlyObtainedLand && sourceOfSuccessfulAttack.armyStrength > 1) {
-            move(sourceOfSuccessfulAttack, newlyObtainedLand);
+            // fixing bug: moving army in territory which made a successful attack => this army could be follow-upped (wrong)
+            if(destOfMovedTroups == sourceOfSuccessfulAttack && sourceOfSuccessfulAttack.armyStrength == 2) {}
+            else {
+                move(sourceOfSuccessfulAttack, newlyObtainedLand);
+            }
         }
     }
 }
